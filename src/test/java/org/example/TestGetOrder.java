@@ -14,13 +14,8 @@ import java.util.List;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.notNullValue;
 //1
-public class TestGetOrder {
+public class TestGetOrder extends ApiTestBase {
     private Number order;
-
-    @Before
-    public void setUp() {
-        RestAssured.baseURI = "http://qa-scooter.praktikum-services.ru/";
-    }
 
     @Test
     @DisplayName("Первый тест")
@@ -35,7 +30,6 @@ public class TestGetOrder {
         List<CreateOrder> createOrders = prepareOrderData();
 
         Response orderResponse = given()
-                .header("Content-type", "application/json")
                 .body(createOrders)
                 .when()
                 .post("/api/v1/orders")
@@ -51,7 +45,6 @@ public class TestGetOrder {
     @Step("Верфикация заказа по ID")
     private void verifyOrderById() {
         given()
-                .header("Content-type", "application/json")
                 .when()
                 .get("/api/v1/orders/track?t=" + this.order)
                 .then()

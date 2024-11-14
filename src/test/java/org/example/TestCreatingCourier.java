@@ -13,20 +13,15 @@ import org.junit.Test;
 import static io.restassured.RestAssured.*;
 import static org.hamcrest.core.IsEqual.equalTo;
 
-public class TestCreatingCourier {
+public class TestCreatingCourier extends ApiTestBase {
     private String courierId; // Переменная для хранения ID созданного курьера
-
-    @Before
-    public void setUp() {
-        RestAssured.baseURI = "http://qa-scooter.praktikum-services.ru/";
-    }
 
     //курьера можно создать;
     @Test
     @DisplayName("Первый тест")
     @Description("проверяет Можно ли создать курьера, какой код ответа") //Описание
     public void testCreateCourier() {
-        CreateCourier createCourier = new CreateCourier("Alabyyeqqquo", "4444", "Roman");
+        CreateCourier createCourier = new CreateCourier("Alabyyeqquo", "4444", "Roman");
         createCourier(createCourier);
         this.courierId = loginCourier(createCourier);
     }
@@ -36,12 +31,10 @@ public class TestCreatingCourier {
     @DisplayName("Второй тест")
     @Description("Проверка ошибки при создании двух одинаковых курьеров") //Описание
     public void testCreateDoubleCourier() {
-        CreateCourier createCourier = new CreateCourier("Vitalik44", "4444", "Roman");
+        CreateCourier createCourier = new CreateCourier("Vitalikkk444", "4444", "Roman");
         createCourier(createCourier);
 
-        given()
-                .header("Content-type", "application/json")
-                .and()
+        requestSpecification
                 .body(createCourier)
                 .when()
                 .post("/api/v1/courier")
@@ -53,12 +46,10 @@ public class TestCreatingCourier {
 
     @Step("Создаем курьера")
     private void createCourier(CreateCourier createCourier) {
-        given()
-                .header("Content-type", "application/json") // передача Content-type в заголовке для указания типа файла
-                .and()
-                .body(createCourier) // передача файла
+        requestSpecification // использует requestSpecification из базового класса
+                .body(createCourier)
                 .when()
-                .post("/api/v1/courier") // отправка POST-запроса
+                .post("/api/v1/courier")
                 .then()
                 .statusCode(201) // проверка кода ответа
                 .body("ok", equalTo(true));
@@ -69,8 +60,7 @@ public class TestCreatingCourier {
         String login = createCourier.getLogin(); // Логин
         String password = createCourier.getPassword(); // Пароль
         IdCourier idCourier = new IdCourier(login, password);
-        Response loginResponse = given()
-                .header("Content-type", "application/json") // Передача Content-type в заголовке
+        Response loginResponse = requestSpecification // использует requestSpecification из базового класса
                 .body(idCourier) // Передача логина и пароля в теле запроса
                 .when()
                 .post("/api/v1/courier/login"); // Отправка POST-запроса
